@@ -26,9 +26,10 @@ import time
 CHARACTERS = ["A","B","C","D","E","F","G","H","I","J", "K","L","M","N","O","P","P","Q","R", "S", "T","U","V","W", "X", "Y","Z"]
 DEFAULT_BOARD_SIZE = 4
 MINIMUM_BOARD_SIZE = 2 # I'm using 2 to make testing easier
-MAXIMUM_BOARD_SIZE = 7 # Over 7 there aren't enough letters in the alphabet
+MAXIMUM_BOARD_SIZE = 20 # For when you're really, REALLY bored
 EXIT_COMMANDS = ["e", "exit"]
 SECONDS_TO_SHOW_BOARD_FOR_AT_START = 3
+
 
 # Variables
 board = [] # Made up of rows represented by lists that hold cells represented by lists that look like: ["A", True] or ["C", False]
@@ -144,7 +145,7 @@ def print_board(show_all=False):
 def main():
 
     # Variables
-    total_matches = 0
+    total_found_cards = 0
 
     #
     #   PROGRAM START
@@ -163,18 +164,14 @@ def main():
 
     # generate a set of random pairs
     chars_to_choose_from = []
-    not_picked_chars = CHARACTERS
     i = 1
     while i < (board_size*board_size)+1:
         print(i)
-        print(not_picked_chars)
         print(chars_to_choose_from)
         if i % 2 == 0:
             chars_to_choose_from.append(chars_to_choose_from[i-2])
         else:
-            char = random.choice(not_picked_chars)
-            not_picked_chars.pop(not_picked_chars.index(char))
-            chars_to_choose_from.append(char)
+            chars_to_choose_from.append(random.choice(CHARACTERS))
         i += 1
 
     # Genarate a board using the pairs
@@ -229,19 +226,22 @@ def main():
                     # Empty the array of cards currently revealed
                     currently_revealed_cards[:] = [] # Can't use currently_revealed_cards=[] because that breaks things for some reason :/
                     
-                    total_matches += 1 # Increment the count of how many pairs have been matched
+                    total_found_cards += 2 # Increment the count of how many pairs have been matched
 
                     print_success("Sucessfull match!")
 
-
-                    if total_matches >= (board_size*board_size)/2:
+                    # Are there as many matches as there are pairs? ()
+                    if total_found_cards >= (board_size*board_size)-1:
+                        # Re print the board, showing all cards incase it was an odd number of cards
+                        clear_console()
+                        print_board(True)
                         print_success("All matches found! Well done")
                         exit_program()
     
                 else:
                     # They don't match, so let's hide them
                     for card in currently_revealed_cards:
-                        board[card[0]][card[1]][1] = False
+                        board[card[0]][card[1]][1] = False # Board[X-coordinate][Y-coordinate][hidden] = False
                     
                     # Clear out the array of cards currently revealed since we're hiding them
                     currently_revealed_cards[:] = [] # Can't use currently_revealed_cards=[] because that breaks things for some reason :/
