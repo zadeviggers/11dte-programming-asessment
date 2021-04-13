@@ -61,8 +61,12 @@ def print_success(what_to_print, exclamation_mark=True):
         print("✔  {}".format(what_to_print))
 
 # Exit the program
-def exit_program():
-    print("You scored {}!".format(score))
+def exit_program(exit_command=None):
+    #print("You scored {}!".format(score))
+
+    if exit_command is not None:
+        print_success("Exit command detected: {}".format(exit_command), False)
+
     print_success("Exiting program")
     exit()
 
@@ -90,6 +94,7 @@ def get_integer_input(prompt, minimun=1, maximun=10, default=None):
         if len(inputted_value) == 0:
             if default is not None:
                 value = default
+                valid_input = True
                 print_warning("No option selected. Defaulting to {}".format(default))
             else:
                 print_error("Please enter a number!")
@@ -97,8 +102,7 @@ def get_integer_input(prompt, minimun=1, maximun=10, default=None):
 
             # If the user provided a valid exit command, exit the program
             if inputted_value in EXIT_COMMANDS:
-                print_success("Exit command detected: {}".format(inputted_value), False)
-                exit_program()
+                exit_program(inputted_value)
 
             # Try and cast the input to an integer
             try:
@@ -127,19 +131,31 @@ def clear_console():
 
 # Print the board
 def print_board(show_all=False):
-    column_numbers = "  "
+
+    # Print the column numbers (the numbers along the top)
+    column_numbers = "   "
+    # Add a number for each row in the board
     for i in range(len(board)):
-        column_numbers += " {} ".format(i+1)
+        column_numbers += " {}".format(i+1)
+        if len(str(i+1)) < 2:
+            column_numbers += " " # Extra space so that the sigle digit column numbers line up
+
     print(column_numbers + "\n")
 
+    # Loop through each row, using enumerate to get both the actual list element and the index
     for i, row in enumerate(board):
+
         row_text = "{} ".format(i+1)
+        if len(str(i+1)) < 2:
+            row_text += " " # Extra space so that the sigle digit row numbers line up
+
         for col in row:
                 if col[1] or show_all:
                     row_text += " {} ".format(col[0])
                 else:
                     row_text += " # "
         print(row_text + "\n")
+
 
 # Main program
 def main():
@@ -166,8 +182,8 @@ def main():
     chars_to_choose_from = []
     i = 1
     while i < (board_size*board_size)+1:
-        print(i)
-        print(chars_to_choose_from)
+        #print(i)
+        #print(chars_to_choose_from)
         if i % 2 == 0:
             chars_to_choose_from.append(chars_to_choose_from[i-2])
         else:
@@ -263,5 +279,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        exit_program()
+        exit_program("ctrl+C")
 
