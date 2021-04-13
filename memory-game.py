@@ -119,7 +119,7 @@ def get_integer_input(prompt, minimum=1, maximum=10, default=None):
     valid_input = False
     # Loop until a valid input is provided or the user chooses to exit the program
     while not valid_input:
-        print("{} (between {} & {})?".format(prompt, minimum, maximum))
+        print("{}? (between {} & {})".format(prompt, minimum, maximum))
         inputted_value = input("$ ").strip().lower() # Get input from user
 
         # If a default was set and the user inputted nothing, use the default
@@ -199,14 +199,23 @@ def main():
 
     print("Welcome to Memories!")
     print("This is a memory game.")
-    print("Type 'e' or 'exit' to exit the program at any time.")
+    print("Type 'e' or 'exit' in any input field to exit the game.")
+    print("When you choose a board size, all of the characters will be shown for a few seconds.")
+    print("During this time, try and memorise as many pairs as you can.")
+    print("The cards will then be hidden and you will need to chose a column and a row to")
+    print("show a character from.")
+    print("You will then choose another column and row to show a caracter from, and if the")
+    print("two caracters match, they will be permanently revealed. Otherwise they will both")
+    print("be hidden again.")
+    print("Once all of the pairs have been found, the game is over.")
+    print("Have fun!\n\n")
 
     #
     #  BOARD GENAERATION
     #
 
     # Ask the user how large they would like the board to be
-    board_size = get_integer_input("What size board would you like", minimum=MINIMUM_BOARD_SIZE, maximum=MAXIMUM_BOARD_SIZE, default=DEFAULT_BOARD_SIZE)
+    board_size = get_integer_input("What size board would you like to play on", minimum=MINIMUM_BOARD_SIZE, maximum=MAXIMUM_BOARD_SIZE, default=DEFAULT_BOARD_SIZE)
 
     # generate a set of random pairs
     chars_to_choose_from = []
