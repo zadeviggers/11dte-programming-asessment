@@ -29,13 +29,19 @@ DEFAULT_BOARD_SIZE = 4
 MINIMUM_BOARD_SIZE = 2 # I'm using 2 to make testing easier
 MAXIMUM_BOARD_SIZE = 20 # For when you're really, REALLY bored
 EXIT_COMMANDS = ["e", "exit"]
-SECONDS_TO_SHOW_BOARD_FOR_AT_START = 3
+TIME_TO_SHOW_CHARACTERS_FOR_AFTER_UNSUCCESSFULL_MATCH = 2
+
+# Indexes
+X_COORDINATE = 0
+Y_COORDINATE = 1
+CHARACTER = 0
+BEING_SHOWN = 1
 
 # Variables
-board = [] # Made up of rows represented by lists that hold cells represented by lists that look like: ["A", True] or ["C", False]
+board = [] # Made up of rows represented by lists that hold cells represented by lists that look like: [card symbol, showing]. E.g. ["C", False]
+currently_revealed_cards = [] # Made of of pair of coodrinates of cards that are currently being shown
 board_size = DEFAULT_BOARD_SIZE
-currently_revealed_cards = [] # Made of of pair of coodrinated of cards that are currently being shown
-score = 0
+
 
 # Functions
 
@@ -102,7 +108,7 @@ def clear_console():
     print(str)
 
 # Get a valid integer input from the user
-def get_integer_input(prompt, minimum=1, maximum=10, default=None):
+def get_integer_input(prompt, minimum, maximum, default=None):
     """Gets a valid integer from the user, allowing for maximum and minimum values.
 
     Args:
@@ -129,7 +135,7 @@ def get_integer_input(prompt, minimum=1, maximum=10, default=None):
                 valid_input = True
                 print_warning("No option selected. Defaulting to {}".format(default))
             else:
-                print_error("Please enter a number!")
+                print_error("Please enter a number")
         else:
 
             # If the user provided a valid exit command, exit the program
@@ -166,22 +172,25 @@ def print_board(show_all=False):
     for i in range(len(board)):
         column_numbers += " {}".format(i+1)
         if len(str(i+1)) < 2:
-            column_numbers += " " # Extra space so that the sigle digit column numbers line up
+            column_numbers += " " # Extra space so that the single digit column numbers line up with the double digit ones
 
     print(column_numbers + "\n")
 
     # Loop through each row, using enumerate to get both the actual list element and the index
     for i, row in enumerate(board):
 
+        # Build up the row that we're about to display
         row_text = "{} ".format(i+1)
         if len(str(i+1)) < 2:
-            row_text += " " # Extra space so that the sigle digit row numbers line up
+            row_text += " " # Extra space so that the single digit column numbers line up with the double digit ones
 
-        for col in row:
-                if col[1] or show_all:
-                    row_text += " {} ".format(col[0])
-                else:
-                    row_text += " # "
+        for cell in row:
+            # If the cell is currently being shown, or the function has been instructed to show all the cells, show the cell
+            if cell[BEING_SHOWN] or show_all:
+                row_text += " {} ".format(cell[CHARACTER])
+            # Otherwise show a # symbol
+            else:
+                row_text += " # "
         print(row_text + "\n")
 
 
@@ -218,7 +227,47 @@ def main():
     board_size = get_integer_input("What size board would you like to play on", minimum=MINIMUM_BOARD_SIZE, maximum=MAXIMUM_BOARD_SIZE, default=DEFAULT_BOARD_SIZE)
 
     # generate a set of random pairs
+    #
+    # (⌐■_■)
+    # Welcome to my legendary board generation alogorithm!
+    #
+    # +==================================================================+
+    #
+    # 1. Generate a list of pairs of characters for our board generator to use from a list of characters available to us to use in the board
+    #     (This is defined in the constants section at the top of the file).
+    #
+    #   - Work out how many cells are in the board, and loop that many times. (We're using a 1-indexed loop to avoid some 
+    #      dividing by Zero madness, so we need to add 1 to the number passed to the loop condition)
+    #       
+    #       - If it's an even number (every second iteration) add the previous character to the list again,
+    #          (This makes sure evey character has a pair)
+    #       - Otherwise, add a random character to the list from the list of characters that can be used in the game.
+    #          (This does result in many duplicate pairs, but thats okay - it just makes the game slightly easier).
+    #
+    # 2. Loop through a range() of the board size (board width), and for each iteration:
+    #
+    #   - Make a list to store the cells for this row in,
+    #   - Loop through a range() of the board size AGAIN (board height this time), and for each iteration:
+    #
+    #       - Choose a random character from the list of pairs we generated in the first step,
+    #       - Remove it from the list of pairs we generated in the first step,
+    #       - Append it to the row list we just made.
+    #   
+    #   - Append the row list we just generated onto the board.
+    #
+    # +==================================================================+
+    # 
+    # ( •_•)>⌐■-■
+    # Well, that wasn't so bad, was it? 
+    # If you want to see the original version of this algorithm, designed and implemented by yours truly in JavaScript,
+    #  head on over to ./website-version/app.js ☜(ﾟヮﾟ☜)
+    #
+    # That's all folks! Thanks for coming to my Ted talk.
+    # (•_•)
+    #
+    
     chars_to_choose_from = []
+    # Loop starting at 1 to avoid dividing by zero madness
     i = 1
     while i < (board_size*board_size)+1:
         # For  every second character, just add the previous character to the list. This ensures that there are pairs
@@ -241,7 +290,7 @@ def main():
     #   GAME START
     #
 
-    # Show the board for the size of the board minus 1 seconds
+    # Show the board for the dimentionality of the board - this means that larger boards give a longer time at the start to look at them
     print_board(True)
     time.sleep(board_size)
     clear_console()
@@ -262,12 +311,12 @@ def main():
         
         
         # Make sure that card isn't already locked
-        if board[row][col][1]:
-            print_error("That card has already been chosen!")
+        if board[row][col][BEING_SHOWN]:
+            print_error("That card has already been chosen")
         else:
 
             # Show that card
-            board[row][col][1] = True
+            board[row][col][BEING_SHOWN] = True
             currently_revealed_cards.append([row, col])
             print_board()
 
@@ -275,14 +324,15 @@ def main():
             if len(currently_revealed_cards) >= 2:
 
                 # Do the symbols match?
-                if board[currently_revealed_cards[0][0]][currently_revealed_cards[0][1]][0] == board[currently_revealed_cards[1][0]][currently_revealed_cards[1][1]][0]:
+                # (Using constants defined at the top of this file)
+                if board[currently_revealed_cards[0][X_COORDINATE]][currently_revealed_cards[0][Y_COORDINATE]][CHARACTER] == board[currently_revealed_cards[1][X_COORDINATE]][currently_revealed_cards[1][Y_COORDINATE]][CHARACTER]:
                     # They match!
                     # Empty the array of cards currently revealed
                     currently_revealed_cards[:] = [] # Can't use currently_revealed_cards=[] because that breaks things for some reason :/
                     
                     total_found_cards += 2 # Increment the count of how many pairs have been matched
 
-                    print_success("Sucessfull match!")
+                    print_success("Sucessfull match")
 
                     # Are there as many matches as there are pairs? ()
                     if total_found_cards >= (board_size*board_size)-1:
@@ -295,7 +345,7 @@ def main():
                 else:
                     # They don't match, so let's hide them
                     for card in currently_revealed_cards:
-                        board[card[0]][card[1]][1] = False # Board[X-coordinate][Y-coordinate][hidden] = False
+                        board[card[X_COORDINATE]][card[Y_COORDINATE]][BEING_SHOWN] = False
                     
                     # Clear out the array of cards currently revealed since we're hiding them
                     currently_revealed_cards[:] = [] # Can't use currently_revealed_cards=[] because that breaks things for some reason :/
@@ -303,7 +353,7 @@ def main():
                     print_error("Cards don't match")
 
                     # And then print the board again (after a short wait)
-                    time.sleep(2)
+                    time.sleep(TIME_TO_SHOW_CHARACTERS_FOR_AFTER_UNSUCCESSFULL_MATCH)
                     clear_console()
 
                     
