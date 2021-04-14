@@ -1,4 +1,9 @@
-* {
+/* =================================
+*  11DTE Memory game: Website version by Zade Viggers is licensed under Attribution-ShareAlike 4.0 International.
+*  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+*  Check the LICENSE.md file for more details.
+*/
+================================= * {
   margin: 0;
   padding: 0;
   border: 0;
@@ -25,7 +30,7 @@ main {
 
 .card {
   border: 2px solid #f0f000;
-  cursor:pointer;
+  cursor: pointer;
   margin: 10px;
   border-radius: 10px;
   box-shadow: 10px 10px 5px #888888;

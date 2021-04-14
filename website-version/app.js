@@ -1,4 +1,50 @@
-const emojis = ["😳","😂","😎","😍","😛","😭","🥵","🥶","🤡","🥳","🤢","👺","👻","☠","👽","👾","🤖","💩","🙉","🙀","🦄","🐲","🐳","🦆","👀","👌","👏","👋","🎃","🎉","💎","🔊","🔒","⌛","🍫","🍕","🍖","🚗","🚂"];
+// =================================
+// 11DTE Memory game: Website version by Zade Viggers is licensed under Attribution-ShareAlike 4.0 International.
+// To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
+// Check the LICENSE.md file for more details.
+// =================================
+
+const emojis = [
+  "😳",
+  "😂",
+  "😎",
+  "😍",
+  "😛",
+  "😭",
+  "🥵",
+  "🥶",
+  "🤡",
+  "🥳",
+  "🤢",
+  "👺",
+  "👻",
+  "☠",
+  "👽",
+  "👾",
+  "🤖",
+  "💩",
+  "🙉",
+  "🙀",
+  "🦄",
+  "🐲",
+  "🐳",
+  "🦆",
+  "👀",
+  "👌",
+  "👏",
+  "👋",
+  "🎃",
+  "🎉",
+  "💎",
+  "🔊",
+  "🔒",
+  "⌛",
+  "🍫",
+  "🍕",
+  "🍖",
+  "🚗",
+  "🚂",
+];
 let cardAmount = 12;
 
 let cards = [];
@@ -8,17 +54,18 @@ let flippedCards = 0;
 let notPickedEmojis = emojis;
 let emojiMap = [];
 // Eww
-for (let i = 1; i < cardAmount+1; i++) {
+for (let i = 1; i < cardAmount + 1; i++) {
   if (i % 2 == 0) {
-    console.log("Even!")
-    emojiMap.push(emojiMap[i-2]); // ??!
+    console.log("Even!");
+    emojiMap.push(emojiMap[i - 2]); // ??!
   } else {
-    console.log("Odd!")
-    const emoji = notPickedEmojis[Math.floor(Math.random() * notPickedEmojis.length)];
+    console.log("Odd!");
+    const emoji =
+      notPickedEmojis[Math.floor(Math.random() * notPickedEmojis.length)];
     notPickedEmojis = notPickedEmojis.filter((e) => e !== emoji);
     emojiMap.push(emoji);
   }
-  console.log(i, emojiMap)
+  console.log(i, emojiMap);
 }
 
 // Randomise order of emojis
@@ -33,10 +80,10 @@ let i = 0;
 while (i < cardAmount) {
   const el = document.createElement("buton");
   el.className = "card";
-  el.setAttribute("data-index", i)
-  el.setAttribute("data-flipped", true)
-  el.setAttribute("disabled", true)
-  el.setAttribute("data-locked", false)
+  el.setAttribute("data-index", i);
+  el.setAttribute("data-flipped", true);
+  el.setAttribute("disabled", true);
+  el.setAttribute("data-locked", false);
   el.addEventListener("click", cardClick);
   const contentEl = document.createElement("span");
   contentEl.setAttribute("class", "card-content");
@@ -56,11 +103,11 @@ function cardClick(e) {
   if (disabled) return;
   flippedCards = flippedCards + 1;
   if (flippedCards >= 2) {
-    for (card of cards){
+    for (card of cards) {
       card.setAttribute("disabled", true);
       if (card.children[0].innerHTML == el.children[0].innerHTML) {
         card.setAttribute("data-locked", true);
-        el.setAttribute("data-locked", true)
+        el.setAttribute("data-locked", true);
       }
     }
     setTimeout(() => {
@@ -78,11 +125,10 @@ function cardClick(e) {
   console.log(`Card #${index + 1} is ${flipped ? "now" : "not"} flipped.`);
 }
 
-
 // I hate that I have to do this, but I have to
 setTimeout(() => {
   for (card of cards) {
-    card.setAttribute("data-flipped", false)
-    card.setAttribute("disabled", false)
+    card.setAttribute("data-flipped", false);
+    card.setAttribute("disabled", false);
   }
-},1500)
+}, 1500);
